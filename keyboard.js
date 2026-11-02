@@ -171,7 +171,7 @@ ROWS.forEach((row, r) => {
         const w = us === "\\" ? 1.5 * U : U;
         el("rect", { x, y, width: w - GAP, height: U - GAP, rx: 7 }, g);
         // The US key as printed on it: a letter as a capital
-        label(g, x + 6, y + 15, "us", /[a-z]/.test(us) ? us.toUpperCase() : us);
+        label(g, x + 6, y + 16, "us", /[a-z]/.test(us) ? us.toUpperCase() : us);
         if (letter) {
             label(g, x + (w - GAP) / 2, y + 47, "bg", bgShift, "middle");
         } else {
