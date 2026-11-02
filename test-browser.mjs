@@ -124,6 +124,16 @@ await evaluate("document.getElementById('text').value='Вторник, деве�
 const italicShot = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot.replace(/\.png$/, "-italic.png"), Buffer.from(italicShot.result.data, "base64"));
 check(await evaluate("document.getElementById('italic').click(); getComputedStyle(document.getElementById('text')).fontStyle + localStorage.getItem('bulgarian-keyboard-italic')"), "normal0", "italic off, kept");
+// Copy with Italic: the clipboard has the plain text and the italic HTML
+await send("Browser.grantPermissions", { origin: new URL(url).origin, permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"] });
+await evaluate("document.getElementById('text').value='Пиши <ми>\\nдве'; document.getElementById('italic').checked=true; document.getElementById('copy').click(); true");
+await sleep(500);
+check(await evaluate(`(async () => { const items = await navigator.clipboard.read(); const item = items[0];
+  const html = await (await item.getType('text/html')).text(); const plain = await (await item.getType('text/plain')).text();
+  return [html.includes('font-style: italic') && html.includes('Пиши &lt;ми&gt;<br>две'), plain === 'Пиши <ми>\\nдве'].join(','); })()`), "true,true", "Copy in italic: HTML in italic and plain text");
+await evaluate("document.getElementById('italic').checked=false; document.getElementById('copy').click(); true");
+await sleep(500);
+check(await evaluate("(async () => (await navigator.clipboard.read())[0].types.join(','))()"), "text/plain", "Copy without italic: plain text alone");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

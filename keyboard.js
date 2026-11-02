@@ -79,10 +79,30 @@ italic.addEventListener("change", () => {
     text.focus();
 });
 
+// copyText puts the text on the clipboard: plain, and in italic also as HTML,
+// which an email window pastes in italic (one that takes plain text alone
+// pastes the plain); where the browser cannot write HTML, plain alone
+async function copyText(s, inItalic) {
+    if (inItalic && window.ClipboardItem && navigator.clipboard.write) {
+        const escaped = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+        const html = `<span lang="bg" style="font-style: italic">${escaped}</span>`;
+        try {
+            await navigator.clipboard.write([new ClipboardItem({
+                "text/plain": new Blob([s], { type: "text/plain" }),
+                "text/html": new Blob([html], { type: "text/html" }),
+            })]);
+            return;
+        } catch {
+            // Plain, below
+        }
+    }
+    await navigator.clipboard.writeText(s);
+}
+
 document.getElementById("copy").addEventListener("click", async (e) => {
     const button = e.currentTarget;
     try {
-        await navigator.clipboard.writeText(text.value);
+        await copyText(text.value, italic.checked);
         button.textContent = "Copied";
     } catch {
         text.select();
