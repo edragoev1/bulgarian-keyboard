@@ -21,7 +21,7 @@ button { height: 36px; padding: 0 16px; font: inherit; font-size: 15px; border-r
 button.primary { background: var(--primary); color: #fff; }
 button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
 .hint { color: var(--muted); font-size: 14px; }
-svg { display: block; width: 100%; height: auto; user-select: none; -webkit-user-select: none; }
+svg { display: block; width: 100%; height: auto; margin: 0 0 16px; user-select: none; -webkit-user-select: none; }
 svg .k rect { fill: var(--key); stroke: var(--keyline); }
 svg .k.changed rect { fill: var(--changed); }
 svg .k.mod rect { fill: #dfe3ea; }
@@ -41,16 +41,16 @@ footer a { color: var(--primary); }
 <h1>Bulgarian Phonetic Keyboard</h1>
 <p class="lead">Type Bulgarian on a US keyboard: traditional phonetic, with В on V and Ж on W. Then copy the text where you need it.</p>
 
+<svg id="keyboard" viewBox="0 0 972 334" role="group" aria-label="The layout: tap a key to type it"></svg>
+
 <textarea id="text" lang="bg" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your text"></textarea>
 
 <div class="bar">
   <button id="copy" class="primary" type="button">Copy</button>
   <button id="mode" type="button" aria-pressed="true" title="Esc switches too">Bulgarian</button>
   <button id="clear" type="button">Clear</button>
-  <span class="hint" id="hint">Esc switches between Bulgarian and English. On a phone, tap the keys below, or use the phone's own Bulgarian keyboard.</span>
+  <span class="hint" id="hint">Esc switches between Bulgarian and English. On a phone, tap the keys above, or use the phone's own Bulgarian keyboard.</span>
 </div>
-
-<svg id="keyboard" viewBox="0 0 972 334" role="group" aria-label="The layout: tap a key to type it"></svg>
 
 <footer>Your text stays in this browser: nothing is sent anywhere. Made by <a href="https://pdfjet.com/">PDFjet Software</a>.</footer>
 </main>

@@ -10,7 +10,7 @@ const want = {
     q: "я", w: "ж", e: "е", r: "р", t: "т", y: "ъ", u: "у", i: "и", o: "о", p: "п",
     "[": "ш", "]": "щ", "\\": "ю", "{": "Ш", "}": "Щ", "|": "Ю",
     a: "а", s: "с", d: "д", f: "ф", g: "г", h: "х", j: "й", k: "к", l: "л",
-    z: "з", x: "ь", X: "Ѝ", c: "ц", v: "в", b: "б", n: "н", m: "м",
+    z: "з", x: "ь", X: "ѝ", c: "ц", v: "в", b: "б", n: "н", m: "м",
     "<": "„", ">": "“", W: "Ж", V: "В",
 };
 for (const [us, bg] of Object.entries(want)) {
@@ -18,7 +18,7 @@ for (const [us, bg] of Object.entries(want)) {
 }
 
 // The 30 letters of the Bulgarian alphabet, each on a key, small and capital
-// (Ь has no capital on the keyboard, as in traditional phonetic: Shift+X is Ѝ)
+// (Ь has no capital on the keyboard: Shift+X is the small ѝ)
 const alphabet = "абвгдежзийклмнопрстуфхцчшщъьюя";
 const typed = new Set(TYPES.values());
 for (const letter of alphabet) {

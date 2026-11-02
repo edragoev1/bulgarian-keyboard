@@ -30,12 +30,15 @@ const ROWS = [
         [";", ":", ";", ":"], ["'", "\"", "'", "\""],
     ],
     [
-        ["z", "Z", "з", "З"], ["x", "X", "ь", "Ѝ"], ["c", "C", "ц", "Ц"],
+        ["z", "Z", "з", "З"], ["x", "X", "ь", "ѝ"], ["c", "C", "ц", "Ц"],
         ["v", "V", "в", "В"], ["b", "B", "б", "Б"], ["n", "N", "н", "Н"],
         ["m", "M", "м", "М"], [",", "<", ",", "„"], [".", ">", ".", "“"],
         ["/", "?", "/", "?"],
     ],
 ];
+
+// Shift+X types the small ѝ, the word "and her" (the owner, 2 November 2026);
+// Ь has no capital on this keyboard, as words never begin with it.
 
 // The keys that differ from traditional phonetic, marked in the picture
 const CHANGED = new Set(["w", "v"]);
