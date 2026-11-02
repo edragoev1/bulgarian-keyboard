@@ -104,6 +104,14 @@ const shotData = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot, Buffer.from(shotData.result.data, "base64"));
 check(await evaluate("[...document.querySelectorAll('.bar button')].map(b => b.getBoundingClientRect().width).join(',')"), "112,112,112,112", "the four buttons one width");
 check(await evaluate("document.getElementById('bulgarian').getAttribute('aria-pressed') + document.getElementById('english').getAttribute('aria-pressed')"), "truefalse", "Bulgarian pressed, English not");
+// A key of the picture clicked with the real Shift held
+await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.focus();
+  const keys=[...document.querySelectorAll('#keyboard g.k')];
+  const by=(name)=>keys.find(g=>g.getAttribute('aria-label')===name);
+  const tap=(g, shift)=>g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,shiftKey:shift}));
+  tap(by('ь, with Shift ѝ'), true); tap(by('ь, with Shift ѝ'), false); tap(by('а'), true); tap(by('3, with Shift №'), true);
+  return true; })()`);
+check(await value(), "ѝьА№", "clicking with the real Shift held");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

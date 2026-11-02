@@ -183,7 +183,11 @@ ROWS.forEach((row, r) => {
             e.preventDefault();
             // Caps Lock makes a letter a capital, and Shift with it a small
             // one again, as on a keyboard; the other keys only Shift changes
-            const upper = letter && capsLock ? !shiftOnce : shiftOnce;
+            // The real Shift and Caps Lock held while clicking count as the
+            // picture's own do (the owner: Shift held and the key of ѝ gave ь)
+            const shift = shiftOnce || e.shiftKey;
+            const caps = capsLock || e.getModifierState("CapsLock");
+            const upper = letter && caps ? !shift : shift;
             insert(upper ? bgShift : bg);
             if (shiftOnce) {
                 shiftOnce = false;
