@@ -174,6 +174,10 @@ ROWS.forEach((row, r) => {
         label(g, x + 6, y + 16, "us", /[a-z]/.test(us) ? us.toUpperCase() : us);
         if (letter) {
             label(g, x + (w - GAP) / 2, y + 47, "bg", bgShift, "middle");
+        } else if (/\p{L}/u.test(bgShift)) {
+            // Two letters, as ь and ѝ on X: both in the letters' font and size
+            label(g, x + (w - GAP) / 2 + 8, y + 31, "bg", bgShift, "middle");
+            label(g, x + (w - GAP) / 2 + 8, y + 53, "bg", bg, "middle");
         } else {
             label(g, x + (w - GAP) / 2 + 8, y + 26, "sh", bgShift, "middle");
             label(g, x + (w - GAP) / 2 + 8, y + 50, "bg", bg, "middle");
