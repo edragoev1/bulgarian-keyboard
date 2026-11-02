@@ -136,6 +136,8 @@ await sleep(500);
 check(await evaluate("(async () => (await navigator.clipboard.read())[0].types.join(','))()"), "text/plain", "Copy without italic: plain text alone");
 // Five rows fit without a scroll bar; a sixth needs one
 check(await evaluate("(() => { const t=document.getElementById('text'); t.value='1\\n2\\n3\\n4\\n5'; const five = t.scrollHeight <= t.clientHeight; t.value += '\\n6'; return five + ',' + (t.scrollHeight > t.clientHeight); })()"), "true,true", "five rows fit, six do not");
+// Italic at the left edge of the text box, the buttons ending at its right edge
+check(await evaluate("(() => { const t=document.getElementById('text').getBoundingClientRect(); const c=document.getElementById('italic').getBoundingClientRect(); const b=document.getElementById('clear').getBoundingClientRect(); return Math.round(c.left - t.left) + ',' + Math.round(t.right - b.right); })()"), "0,0", "Italic left, buttons right, edges aligned");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

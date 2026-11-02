@@ -21,7 +21,7 @@ button { width: 112px; height: 36px; padding: 0; font: inherit; font-size: 15px;
 button.primary { background: var(--primary); color: #fff; }
 button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
 .hint { color: var(--muted); font-size: 14px; }
-.check { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px; font-size: 15px; cursor: pointer; user-select: none; }
+.check { margin-right: auto; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 0; font-size: 15px; cursor: pointer; user-select: none; }
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
 textarea.italic { font-style: italic; }
 svg { display: block; width: 100%; height: auto; margin: 0 0 16px; user-select: none; -webkit-user-select: none; }
@@ -51,11 +51,11 @@ footer a { color: var(--primary); }
 <textarea id="text" lang="bg" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your text"></textarea>
 
 <div class="bar">
+  <label class="check"><input id="italic" type="checkbox"> Italic</label>
   <button id="copy" class="primary" type="button">Copy</button>
   <button id="bulgarian" type="button" aria-pressed="true">Bulgarian</button>
   <button id="english" type="button" aria-pressed="false">English</button>
   <button id="clear" type="button">Clear</button>
-  <label class="check"><input id="italic" type="checkbox"> Italic</label>
   <span class="hint" id="hint">On a phone, tap the keys above, or use the phone's own Bulgarian keyboard.</span>
 </div>
 
