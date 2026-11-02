@@ -118,6 +118,12 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value='x'; t
   return true; })()`);
 check(await value(), "x", "the disabled keys type nothing");
 check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 7, "seven disabled keys");
+// Italic: the text box in italic, kept for the next visit
+check(await evaluate("document.getElementById('italic').click(); getComputedStyle(document.getElementById('text')).fontStyle + localStorage.getItem('bulgarian-keyboard-italic')"), "italic1", "italic on, kept");
+await evaluate("document.getElementById('text').value='Вторник, деветнадесети. Пиши ми!'; true");
+const italicShot = await send("Page.captureScreenshot", { format: "png" });
+fs.writeFileSync(shot.replace(/\.png$/, "-italic.png"), Buffer.from(italicShot.result.data, "base64"));
+check(await evaluate("document.getElementById('italic').click(); getComputedStyle(document.getElementById('text')).fontStyle + localStorage.getItem('bulgarian-keyboard-italic')"), "normal0", "italic off, kept");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

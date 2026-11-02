@@ -59,6 +59,26 @@ function setMode(on) {
 bulgarianButton.addEventListener("click", () => setMode(true));
 englishButton.addEventListener("click", () => setMode(false));
 
+// Italic: how the text looks here, the Bulgarian italic letters of the font;
+// what is copied is plain text, without it. Kept for the next visit.
+const italic = document.getElementById("italic");
+const ITALIC = "bulgarian-keyboard-italic";
+try {
+    italic.checked = localStorage.getItem(ITALIC) === "1";
+} catch {
+    // Storage refused
+}
+text.classList.toggle("italic", italic.checked);
+italic.addEventListener("change", () => {
+    text.classList.toggle("italic", italic.checked);
+    try {
+        localStorage.setItem(ITALIC, italic.checked ? "1" : "0");
+    } catch {
+        // As above
+    }
+    text.focus();
+});
+
 document.getElementById("copy").addEventListener("click", async (e) => {
     const button = e.currentTarget;
     try {
