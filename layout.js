@@ -40,9 +40,6 @@ const ROWS = [
 // Shift+X types the small ѝ, the word "and her" (the owner, 2 November 2026);
 // Ь has no capital on this keyboard, as words never begin with it.
 
-// The keys that differ from traditional phonetic, marked in the picture
-const CHANGED = new Set(["w", "v"]);
-
 // What each US character types: the character itself when the key keeps it
 const TYPES = new Map();
 for (const row of ROWS) {
@@ -64,5 +61,5 @@ function cyrillic(text) {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { ROWS, CHANGED, TYPES, cyrillic };
+    module.exports = { ROWS, TYPES, cyrillic };
 }

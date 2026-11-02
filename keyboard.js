@@ -132,7 +132,7 @@ ROWS.forEach((row, r) => {
     x += LEFT[r] * U;
     for (const [us, usShift, bg, bgShift] of row) {
         const letter = bg.toUpperCase() === bgShift && bg !== bgShift;
-        const g = el("g", { class: "k" + (CHANGED.has(us) ? " changed" : ""), role: "button" }, keyboard);
+        const g = el("g", { class: "k", role: "button" }, keyboard);
         g.setAttribute("aria-label", letter ? bg : bg + ", with Shift " + bgShift);
         // The key of \\ is wider, as on a keyboard, and ends its row
         const w = us === "\\" ? 1.5 * U : U;
