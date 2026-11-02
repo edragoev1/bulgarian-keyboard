@@ -49,14 +49,15 @@ await typeText("Vasil `ete [opska");
 check(await value(), "Васил чете шопска", "typing in Bulgarian");
 await typeText(" <Zdravej!>");
 check(await value(), "Васил чете шопска „Здравей!“", "Shift symbols");
-// Esc to English, type, Esc back
+// Esc no longer switches (the owner); the buttons do
 await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
 await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
-await typeText(" PDFjet");
-await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
-await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+await typeText(" ");
+await evaluate("document.getElementById('english').click(); true");
+await typeText("PDFjet");
+await evaluate("document.getElementById('bulgarian').click(); true");
 await typeText(" wena");
-check(await value(), "Васил чете шопска „Здравей!“ PDFjet жена", "Esc to English and back");
+check(await value(), "Васил чете шопска „Здравей!“ PDFjet жена", "English and Bulgarian buttons; Esc does nothing");
 // Edit in the middle: caret after "Васил", type a letter
 await evaluate("const t=document.getElementById('text'); t.setSelectionRange(5,5); true");
 await typeText("a");
@@ -101,6 +102,8 @@ check(await value(), "Я\nж", "the real Caps Lock and Enter");
 await evaluate("document.getElementById('text').value='Васил чете шопска салата. „Здравей!“'; true");
 const shotData = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot, Buffer.from(shotData.result.data, "base64"));
+check(await evaluate("[...document.querySelectorAll('.bar button')].map(b => b.getBoundingClientRect().width).join(',')"), "112,112,112,112", "the four buttons one width");
+check(await evaluate("document.getElementById('bulgarian').getAttribute('aria-pressed') + document.getElementById('english').getAttribute('aria-pressed')"), "truefalse", "Bulgarian pressed, English not");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

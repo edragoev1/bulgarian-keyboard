@@ -7,7 +7,7 @@ owner's, of 1 November 2026 (~/Projects/bulgarian-keyboard.png).
 - layout.js: the layout, one table; the page types with it and draws its
   picture from it.
 - keyboard.js: the page: the text box types Cyrillic as the keys are pressed,
-  Esc switches to English and back, the picture's keys type when tapped, the
+  the picture's keys type when tapped, the
   text is kept in the browser alone.
 - index.html: the page. No network: its policy has connect-src 'none'.
 - test.js: `node test.js` checks the layout against the owner's picture.

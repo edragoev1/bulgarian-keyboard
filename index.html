@@ -17,7 +17,7 @@ h1 { font-size: 26px; margin: 0 0 4px; }
 textarea { display: block; width: 100%; min-height: 160px; padding: 12px 14px; font: 20px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); border: 2px solid var(--line); border-radius: 6px; background: #fff; resize: vertical; }
 textarea:focus { outline: none; border-color: var(--primary); }
 .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 20px; }
-button { height: 36px; padding: 0 16px; font: inherit; font-size: 15px; border-radius: 6px; cursor: pointer; border: 2px solid var(--primary); background: #fff; color: var(--primary); }
+button { width: 112px; height: 36px; padding: 0; font: inherit; font-size: 15px; border-radius: 6px; cursor: pointer; border: 2px solid var(--primary); background: #fff; color: var(--primary); }
 button.primary { background: var(--primary); color: #fff; }
 button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
 .hint { color: var(--muted); font-size: 14px; }
@@ -46,9 +46,10 @@ footer a { color: var(--primary); }
 
 <div class="bar">
   <button id="copy" class="primary" type="button">Copy</button>
-  <button id="mode" type="button" aria-pressed="true" title="Esc switches too">Bulgarian</button>
+  <button id="bulgarian" type="button" aria-pressed="true">Bulgarian</button>
+  <button id="english" type="button" aria-pressed="false">English</button>
   <button id="clear" type="button">Clear</button>
-  <span class="hint" id="hint">Esc switches between Bulgarian and English. On a phone, tap the keys above, or use the phone's own Bulgarian keyboard.</span>
+  <span class="hint" id="hint">On a phone, tap the keys above, or use the phone's own Bulgarian keyboard.</span>
 </div>
 
 <footer>Your text stays in this browser: nothing is sent anywhere. Made by <a href="https://pdfjet.com/">PDFjet Software</a>.</footer>

@@ -1,11 +1,12 @@
 // The page: the text box types with the layout (layout.js), as the keys are
-// pressed, so the text is edited in Cyrillic; Esc or the button switches to
-// English and back; the picture is drawn from the same table, and its keys
+// pressed, so the text is edited in Cyrillic; the buttons Bulgarian and
+// English switch; the picture is drawn from the same table, and its keys
 // type when tapped, for a phone. The text is kept in this browser alone.
 "use strict";
 
 const text = document.getElementById("text");
-const modeButton = document.getElementById("mode");
+const bulgarianButton = document.getElementById("bulgarian");
+const englishButton = document.getElementById("english");
 const STORE = "bulgarian-keyboard-text";
 let bulgarian = true;
 let shiftOnce = false;
@@ -47,21 +48,16 @@ text.addEventListener("beforeinput", (e) => {
     }
 });
 
+// Bulgarian or English: two buttons, the one in use pressed (the owner: no
+// switching with Esc, 2 November 2026)
 function setMode(on) {
     bulgarian = on;
-    modeButton.setAttribute("aria-pressed", String(on));
-    modeButton.textContent = on ? "Bulgarian" : "English";
-}
-modeButton.addEventListener("click", () => {
-    setMode(!bulgarian);
+    bulgarianButton.setAttribute("aria-pressed", String(on));
+    englishButton.setAttribute("aria-pressed", String(!on));
     text.focus();
-});
-text.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-        e.preventDefault();
-        setMode(!bulgarian);
-    }
-});
+}
+bulgarianButton.addEventListener("click", () => setMode(true));
+englishButton.addEventListener("click", () => setMode(false));
 
 document.getElementById("copy").addEventListener("click", async (e) => {
     const button = e.currentTarget;
