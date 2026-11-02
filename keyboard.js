@@ -106,21 +106,54 @@ function label(g, x, y, cls, s, anchor = "start") {
 }
 
 const shiftKeys = [];
+let capsKey = null;
+let capsLock = false;
 
+// The keys of the picture that are not characters: Shift for the next key,
+// Caps Lock until tapped again, and the three that edit
 function modifier(x, y, w, name) {
-    const g = el("g", { class: "k mod" }, keyboard);
+    const g = el("g", { class: "k mod", role: "button" }, keyboard);
     el("rect", { x, y, width: w * U - GAP, height: U - GAP, rx: 7 }, g);
     label(g, x + (w * U - GAP) / 2, y + U / 2 + 4, "label", name, "middle");
+    g.setAttribute("aria-label", name);
     if (name === "Shift") {
         shiftKeys.push(g);
-        g.setAttribute("role", "button");
         g.setAttribute("aria-label", "Shift for the next key");
-        g.addEventListener("pointerdown", (e) => {
-            e.preventDefault();
-            shiftOnce = !shiftOnce;
-            shiftKeys.forEach((s) => s.classList.toggle("on", shiftOnce));
-        });
     }
+    if (name === "Caps Lock") {
+        capsKey = g;
+    }
+    g.addEventListener("pointerdown", (e) => {
+        // The text box keeps the caret
+        e.preventDefault();
+        switch (name) {
+            case "Shift":
+                shiftOnce = !shiftOnce;
+                shiftKeys.forEach((s) => s.classList.toggle("on", shiftOnce));
+                break;
+            case "Caps Lock":
+                capsLock = !capsLock;
+                capsKey.classList.toggle("on", capsLock);
+                break;
+            case "Enter":
+                insert("\n");
+                break;
+            case "Tab":
+                insert("\t");
+                break;
+            case "Backspace":
+                text.focus();
+                if (!document.execCommand("delete")) {
+                    const start = text.selectionStart;
+                    const end = text.selectionEnd;
+                    if (start !== end || start > 0) {
+                        text.setRangeText("", start === end ? start - 1 : start, end, "end");
+                        text.dispatchEvent(new Event("input"));
+                    }
+                }
+                break;
+        }
+    });
 }
 
 ROWS.forEach((row, r) => {
@@ -148,7 +181,10 @@ ROWS.forEach((row, r) => {
         g.addEventListener("pointerdown", (e) => {
             // The text box keeps the caret
             e.preventDefault();
-            insert(shiftOnce ? bgShift : bg);
+            // Caps Lock makes a letter a capital, and Shift with it a small
+            // one again, as on a keyboard; the other keys only Shift changes
+            const upper = letter && capsLock ? !shiftOnce : shiftOnce;
+            insert(upper ? bgShift : bg);
             if (shiftOnce) {
                 shiftOnce = false;
                 shiftKeys.forEach((s) => s.classList.remove("on"));

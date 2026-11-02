@@ -11,6 +11,8 @@ owner's, of 1 November 2026 (~/Projects/bulgarian-keyboard.png).
   text is kept in the browser alone.
 - index.html: the page. No network: its policy has connect-src 'none'.
 - test.js: `node test.js` checks the layout against the owner's picture.
+- test-browser.mjs: the page in a headless Chrome, typed into key by key.
+- check.sh: both; exit 0 when all pass.
 
 To try it: `python3 -m http.server` here, then http://127.0.0.1:8000/ (the
 policy allows scripts of the page's own address only, not of file://).
