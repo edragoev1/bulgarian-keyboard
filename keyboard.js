@@ -200,10 +200,26 @@ ROWS.forEach((row, r) => {
         modifier(x, y, RIGHT[r][1], RIGHT[r][0]);
     }
 });
-// The space bar
-const space = el("g", { class: "k", role: "button", "aria-label": "Space" }, keyboard);
-el("rect", { x: 6 + 3.5 * U, y: 4 * U + 6, width: 6 * U - GAP, height: U - GAP, rx: 7 }, space);
-space.addEventListener("pointerdown", (e) => {
-    e.preventDefault();
-    insert(" ");
-});
+// The bottom row: the space bar, and the keys a page cannot use, shown so that
+// the picture is a whole keyboard, and plainly disabled (the owner, 2 November
+// 2026)
+const BOTTOM = [["Ctrl", 1.5], ["Super", 1.25], ["Alt", 1.25], [" ", 6], ["Alt", 1.25], ["Super", 1.25], ["Menu", 1.25], ["Ctrl", 1.25]];
+let bottomX = 6;
+const bottomY = 4 * U + 6;
+for (const [name, w] of BOTTOM) {
+    if (name === " ") {
+        const space = el("g", { class: "k", role: "button", "aria-label": "Space" }, keyboard);
+        el("rect", { x: bottomX, y: bottomY, width: w * U - GAP, height: U - GAP, rx: 7 }, space);
+        space.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            insert(" ");
+        });
+    } else {
+        const g = el("g", { class: "k off", role: "button", "aria-label": name, "aria-disabled": "true" }, keyboard);
+        el("rect", { x: bottomX, y: bottomY, width: w * U - GAP, height: U - GAP, rx: 7 }, g);
+        label(g, bottomX + (w * U - GAP) / 2, bottomY + U / 2 + 4, "label", name, "middle");
+        // The text box keeps the caret, and nothing happens
+        g.addEventListener("pointerdown", (e) => e.preventDefault());
+    }
+    bottomX += w * U;
+}

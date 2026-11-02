@@ -112,6 +112,12 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.
   tap(by('ь, with Shift ѝ'), true); tap(by('ь, with Shift ѝ'), false); tap(by('а'), true); tap(by('3, with Shift №'), true);
   return true; })()`);
 check(await value(), "ѝьА№", "clicking with the real Shift held");
+// The disabled keys of the bottom row type nothing
+await evaluate(`(() => { const t=document.getElementById('text'); t.value='x'; t.focus();
+  for (const g of document.querySelectorAll('#keyboard g.k.off')) g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
+  return true; })()`);
+check(await value(), "x", "the disabled keys type nothing");
+check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 7, "seven disabled keys");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");
