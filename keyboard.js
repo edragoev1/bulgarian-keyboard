@@ -88,9 +88,14 @@ try {
 } catch {
     // Storage refused
 }
-document.getElementById("keyboard").toggleAttribute("hidden", hide.checked);
-hide.addEventListener("change", () => {
+// The text box then fills the window (the owner, 2 November 2026)
+function showKeyboard() {
     document.getElementById("keyboard").toggleAttribute("hidden", hide.checked);
+    document.body.classList.toggle("bare", hide.checked);
+}
+showKeyboard();
+hide.addEventListener("change", () => {
+    showKeyboard();
     try {
         localStorage.setItem(HIDE, hide.checked ? "1" : "0");
     } catch {

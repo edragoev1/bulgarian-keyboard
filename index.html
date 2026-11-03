@@ -24,6 +24,10 @@ button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
 .check { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 0; font-size: 15px; cursor: pointer; user-select: none; }
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
 textarea.italic { font-style: italic; }
+/* Keyboard hidden: the text box fills the window, the page never scrolls */
+body.bare { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+body.bare main { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; }
+body.bare textarea { flex: 1; height: auto; resize: none; }
 svg[hidden] { display: none; }
 svg { display: block; width: 100%; height: auto; margin: 0 0 16px; user-select: none; -webkit-user-select: none; }
 svg .k rect { fill: var(--key); stroke: var(--keyline); }
