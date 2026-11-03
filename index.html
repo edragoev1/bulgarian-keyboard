@@ -64,6 +64,15 @@ svg .label { fill: var(--muted); font-size: 14.5px; font-weight: 600; }
 @media (max-width: 359px) {
   .bar button { font-size: 13px; }
 }
+/* A phone: the page is made for computers, so a note in place of the
+   keyboard (the owner, 2 November 2026: "pretty useless on phones", people
+   would be disappointed). A tablet with a trackpad or mouse can hover, and
+   keeps the page. */
+.phone-note { display: none; margin: 8px 0 0; font-size: 17px; }
+@media (pointer: coarse) and (any-hover: none) {
+  .lead, svg#keyboard, textarea, .bar { display: none; }
+  .phone-note { display: block; }
+}
 footer { margin-top: 20px; color: var(--muted); font-size: 13px; }
 footer a { color: var(--primary); }
 </style>
@@ -72,6 +81,8 @@ footer a { color: var(--primary); }
 <main>
 <h1>Bulgarian Phonetic Keyboard</h1>
 <p class="lead">Type Bulgarian on a US keyboard: traditional phonetic, with В on V and Ж on W. Then copy the text and paste it where you need it.</p>
+
+<p class="phone-note">This keyboard is made for computers: you type on your own keyboard and get Bulgarian. On a phone, your phone's own Bulgarian keyboard is the better choice; you can add it in the phone's keyboard settings.</p>
 
 <svg id="keyboard" lang="bg" viewBox="0 0 972 334" role="group" aria-label="The layout: tap a key to type it"></svg>
 

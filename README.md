@@ -28,6 +28,11 @@ Why this keyboard:
 - keyboard.js: the page: the text box types Cyrillic as the keys are pressed,
   the picture's keys type when tapped, the
   text is kept in the browser alone.
+- Phones: the page is made for computers; a phone (touch only, no hover)
+  gets a short note in place of the keyboard, pointing to the phone's own
+  Bulgarian keyboard. A tablet with a trackpad or mouse keeps the page. An
+  on-screen alphabet keyboard for phones was tried and set aside: branch
+  phone-alphabet.
 - index.html: the page. No network: its policy has connect-src 'none'.
 - test.js: `node test.js` checks the layout, key by key.
 - test-browser.mjs: the page in a headless Chrome, typed into key by key.

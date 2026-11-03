@@ -169,26 +169,17 @@ check(await evaluate("[document.getElementById('hide').checked, document.getElem
 const hiddenShot = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot.replace(/\.png$/, "-hidden.png"), Buffer.from(hiddenShot.result.data, "base64"));
 await evaluate("localStorage.removeItem('bulgarian-keyboard-hide'); true");
-// A phone: no picture, no Hide keyboard, even if it was ticked; Italic on its
-// own row; the four buttons one row, one width, from edge to edge of the
-// text box; no sideways scrolling; at 375 and 320 pixels
-await evaluate("localStorage.setItem('bulgarian-keyboard-hide', '1'); true");
+// A phone: the note in place of the keyboard, the text box and the buttons;
+// no sideways scrolling; at 375 and 320 pixels
 await send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
 await send("Emulation.setEmitTouchEventsForMouse", { enabled: true, configuration: "mobile" });
 for (const width of [375, 320]) {
     await send("Emulation.setDeviceMetricsOverride", { width, height: 740, deviceScaleFactor: 2, mobile: true });
     await send("Page.reload");
     await sleep(1500);
-    check(await evaluate(`(() => { const r=(id)=>document.getElementById(id).getBoundingClientRect(); const t=r('text'); const b=['bulgarian','english','clear','copy'].map(r);
-      const oneRow=b.every(x=>Math.abs(x.top-b[0].top)<0.5); const oneWidth=b.every(x=>Math.abs(x.width-b[0].width)<0.5);
-      const edges=Math.round(b[0].left-t.left)+'/'+Math.round(t.right-b[3].right); const below=b[0].top>r('italic').bottom;
-      const fits=[...document.querySelectorAll('.bar button')].every(x=>x.scrollWidth<=x.clientWidth);
-      return [r('keyboard').height, document.querySelector('.hide-option').getBoundingClientRect().height, oneRow, oneWidth, edges, below, fits, document.documentElement.scrollWidth<=innerWidth, document.activeElement===document.getElementById('text'), Math.round(t.height)].join(); })()`),
-      "0,0,true,true,0/0,true,true,true,false,178", `a phone, ${width} px: no picture, buttons aligned, no focus`);
-    // Typing with the phone's own keyboard still works
-    await evaluate("(() => { const t=document.getElementById('text'); t.value=''; t.focus(); return true; })()");
-    await typeText("wena");
-    check(await value(), "жена", `a phone, ${width} px: typing`);
+    check(await evaluate(`(() => { const h=(sel)=>Math.round(document.querySelector(sel).getBoundingClientRect().height);
+      return [h('.phone-note')>40, h('#keyboard'), h('#text'), h('.bar'), h('.lead'), h('footer')>0, document.documentElement.scrollWidth<=innerWidth].join(); })()`),
+      "true,0,0,0,0,true,true", `a phone, ${width} px: the note, no keyboard, text box or buttons`);
     if (width === 375) {
         const phoneShot = await send("Page.captureScreenshot", { format: "png" });
         fs.writeFileSync(shot.replace(/\.png$/, "-phone.png"), Buffer.from(phoneShot.result.data, "base64"));
@@ -197,7 +188,10 @@ for (const width of [375, 320]) {
 await send("Emulation.clearDeviceMetricsOverride");
 await send("Emulation.setTouchEmulationEnabled", { enabled: false });
 await send("Emulation.setEmitTouchEventsForMouse", { enabled: false });
-await evaluate("localStorage.removeItem('bulgarian-keyboard-hide'); true");
+await send("Page.reload");
+await sleep(1500);
+// The desktop: no note
+check(await evaluate("Math.round(document.querySelector('.phone-note').getBoundingClientRect().height)"), 0, "the desktop: no phone note");
 // IBM Plex Sans loaded, and drawing the Bulgarian forms: the same letters
 // are a different width with lang="bg" than with lang="ru"
 check(await evaluate(`(async () => { await document.fonts.ready; await document.fonts.load('italic 16px Plex', 'д');
