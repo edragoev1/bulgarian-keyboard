@@ -32,6 +32,12 @@ const evaluate = async (expr) => (await send("Runtime.evaluate", { expression: e
 await send("Runtime.enable"); await send("Log.enable"); await send("Page.enable");
 await send("Page.navigate", { url });
 await sleep(1500);
+// Loaded with a text kept from the last visit: the text box has the focus,
+// the caret after the text (the owner, 2 November 2026)
+await evaluate("localStorage.setItem('bulgarian-keyboard-text', 'Здравей'); true");
+await send("Page.reload");
+await sleep(1500);
+const focusOnLoad = await evaluate("(() => { const t=document.getElementById('text'); return [document.activeElement===t, t.selectionStart, t.selectionEnd].join(); })()");
 await evaluate("localStorage.clear(); document.getElementById('text').value=''; document.getElementById('text').focus(); true");
 
 // A key as the US keyboard sends it: its character, with Shift for capitals and symbols
@@ -44,6 +50,8 @@ async function typeText(s) { for (const ch of s) await key(ch); }
 const value = () => evaluate("document.getElementById('text').value");
 let fail = 0;
 const check = (got, want, what) => { if (got !== want) { fail++; console.log(`FAIL ${what}: ${JSON.stringify(got)} want ${JSON.stringify(want)}`); } else console.log(`PASS ${what}`); };
+
+check(focusOnLoad, "true,7,7", "the focus in the text box on load, the caret at the end");
 
 await typeText("Vasil `ete [opska");
 check(await value(), "Васил чете шопска", "typing in Bulgarian");

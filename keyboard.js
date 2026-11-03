@@ -263,3 +263,11 @@ for (const [name, w] of BOTTOM) {
     }
     bottomX += w * U;
 }
+
+// Ready to type at once, after the text of the last visit (the owner, 2
+// November 2026); not on a touch screen, where the focus would open the
+// phone's own keyboard over the picture
+if (!window.matchMedia("(pointer: coarse)").matches) {
+    text.focus();
+    text.setSelectionRange(text.value.length, text.value.length);
+}
