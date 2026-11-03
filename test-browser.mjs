@@ -126,26 +126,16 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value='x'; t
   return true; })()`);
 check(await value(), "x", "the disabled keys type nothing");
 check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 7, "seven disabled keys");
-// Italic: the text box in italic, kept for the next visit
-check(await evaluate("document.getElementById('italic').click(); getComputedStyle(document.getElementById('text')).fontStyle + localStorage.getItem('bulgarian-keyboard-italic')"), "italic1", "italic on, kept");
-await evaluate("document.getElementById('text').value='Вторник, деветнадесети. Пиши ми!'; true");
-const italicShot = await send("Page.captureScreenshot", { format: "png" });
-fs.writeFileSync(shot.replace(/\.png$/, "-italic.png"), Buffer.from(italicShot.result.data, "base64"));
-check(await evaluate("document.getElementById('italic').click(); getComputedStyle(document.getElementById('text')).fontStyle + localStorage.getItem('bulgarian-keyboard-italic')"), "normal0", "italic off, kept");
-// Copy with Italic: the clipboard has the plain text and the italic HTML
+// Copy: plain text alone
 await send("Browser.grantPermissions", { origin: new URL(url).origin, permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"] });
-await evaluate("document.getElementById('text').value='Пиши <ми>\\nдве'; document.getElementById('italic').checked=true; document.getElementById('copy').click(); true");
+await evaluate("document.getElementById('text').value='Пиши <ми>\\nдве'; document.getElementById('copy').click(); true");
 await sleep(500);
-check(await evaluate(`(async () => { const items = await navigator.clipboard.read(); const item = items[0];
-  const html = await (await item.getType('text/html')).text(); const plain = await (await item.getType('text/plain')).text();
-  return [html.includes('font-style: italic') && html.includes('Пиши &lt;ми&gt;<br>две'), plain === 'Пиши <ми>\\nдве'].join(','); })()`), "true,true", "Copy in italic: HTML in italic and plain text");
-await evaluate("document.getElementById('italic').checked=false; document.getElementById('copy').click(); true");
-await sleep(500);
-check(await evaluate("(async () => (await navigator.clipboard.read())[0].types.join(','))()"), "text/plain", "Copy without italic: plain text alone");
+check(await evaluate(`(async () => { const item=(await navigator.clipboard.read())[0]; return item.types.join(',') + '|' + await (await item.getType('text/plain')).text(); })()`), "text/plain|Пиши <ми>\nдве", "Copy: plain text alone");
+check(await evaluate("[document.getElementById('italic'), localStorage.getItem('bulgarian-keyboard-italic')].join()"), ",", "no Italic, its old setting cleared");
 // Five rows fit without a scroll bar; a sixth needs one
 check(await evaluate("(() => { const t=document.getElementById('text'); t.value='1\\n2\\n3\\n4\\n5'; const five = t.scrollHeight <= t.clientHeight; t.value += '\\n6'; return five + ',' + (t.scrollHeight > t.clientHeight); })()"), "true,true", "five rows fit, six do not");
-// Italic at the left edge of the text box, the buttons ending at its right edge
-check(await evaluate("(() => { const t=document.getElementById('text').getBoundingClientRect(); const c=document.getElementById('italic').getBoundingClientRect(); const b=document.getElementById('copy').getBoundingClientRect(); return Math.round(c.left - t.left) + ',' + Math.round(t.right - b.right); })()"), "0,0", "Italic left, buttons right, edges aligned");
+// Hide keyboard at the left edge of the text box, the buttons ending at its right edge
+check(await evaluate("(() => { const t=document.getElementById('text').getBoundingClientRect(); const c=document.getElementById('hide').getBoundingClientRect(); const b=document.getElementById('copy').getBoundingClientRect(); return Math.round(c.left - t.left) + ',' + Math.round(t.right - b.right); })()"), "0,0", "Hide keyboard left, buttons right, edges aligned");
 check(await evaluate("[...document.querySelectorAll('.bar button')].map(b => b.id).join(',')"), "bulgarian,english,clear,copy", "the order of the buttons");
 // Hide keyboard: the picture gone, the text box in its place, the buttons
 // not moved; kept; and back
@@ -194,11 +184,11 @@ await sleep(1500);
 check(await evaluate("Math.round(document.querySelector('.phone-note').getBoundingClientRect().height)"), 0, "the desktop: no phone note");
 // IBM Plex Sans loaded, and drawing the Bulgarian forms: the same letters
 // are a different width with lang="bg" than with lang="ru"
-check(await evaluate(`(async () => { await document.fonts.ready; await document.fonts.load('italic 16px Plex', 'д');
+check(await evaluate(`(async () => { await document.fonts.ready; 
   const span=(lang, style)=>{ const e=document.createElement('span'); e.lang=lang; e.style.cssText='font: 40px Plex; position: absolute; white-space: pre;' + style; e.textContent='вгджзиклптцшщъью'; document.body.appendChild(e); const w=e.getBoundingClientRect().width; e.remove(); return w; };
-  return [document.fonts.check('16px Plex'), document.fonts.check('italic 16px Plex'), document.fonts.check('600 16px Plex'),
-    span('bg','') !== span('ru',''), span('bg','font-style: italic') !== span('ru','font-style: italic'), getComputedStyle(document.getElementById('text')).fontFamily.startsWith('Plex')].join(); })()`),
-  "true,true,true,true,true,true", "Plex Sans loaded, with the Bulgarian letter forms");
+  return [document.fonts.check('16px Plex'), document.fonts.check('600 16px Plex'),
+    span('bg','') !== span('ru',''), getComputedStyle(document.getElementById('text')).fontFamily.startsWith('Plex')].join(); })()`),
+  "true,true,true,true", "Plex Sans loaded, with the Bulgarian letter forms");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

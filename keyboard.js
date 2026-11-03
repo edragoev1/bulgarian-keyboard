@@ -59,25 +59,13 @@ function setMode(on) {
 bulgarianButton.addEventListener("click", () => setMode(true));
 englishButton.addEventListener("click", () => setMode(false));
 
-// Italic: how the text looks here, the Bulgarian italic letters of the font;
-// what is copied is plain text, without it. Kept for the next visit.
-const italic = document.getElementById("italic");
-const ITALIC = "bulgarian-keyboard-italic";
+// Italic was removed (the owner, 2 November 2026): what it copied depended on
+// where it was pasted. Its old setting is cleared.
 try {
-    italic.checked = localStorage.getItem(ITALIC) === "1";
+    localStorage.removeItem("bulgarian-keyboard-italic");
 } catch {
     // Storage refused
 }
-text.classList.toggle("italic", italic.checked);
-italic.addEventListener("change", () => {
-    text.classList.toggle("italic", italic.checked);
-    try {
-        localStorage.setItem(ITALIC, italic.checked ? "1" : "0");
-    } catch {
-        // As above
-    }
-    text.focus();
-});
 
 // Hide keyboard: the picture out of the way, for those who type without
 // looking (the owner, 2 November 2026); kept for the next visit
@@ -105,30 +93,10 @@ hide.addEventListener("change", () => {
     text.focus();
 });
 
-// copyText puts the text on the clipboard: plain, and in italic also as HTML,
-// which an email window pastes in italic (one that takes plain text alone
-// pastes the plain); where the browser cannot write HTML, plain alone
-async function copyText(s, inItalic) {
-    if (inItalic && window.ClipboardItem && navigator.clipboard.write) {
-        const escaped = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
-        const html = `<span lang="bg" style="font-style: italic">${escaped}</span>`;
-        try {
-            await navigator.clipboard.write([new ClipboardItem({
-                "text/plain": new Blob([s], { type: "text/plain" }),
-                "text/html": new Blob([html], { type: "text/html" }),
-            })]);
-            return;
-        } catch {
-            // Plain, below
-        }
-    }
-    await navigator.clipboard.writeText(s);
-}
-
 document.getElementById("copy").addEventListener("click", async (e) => {
     const button = e.currentTarget;
     try {
-        await copyText(text.value, italic.checked);
+        await navigator.clipboard.writeText(text.value);
         button.textContent = "Copied";
     } catch {
         text.select();

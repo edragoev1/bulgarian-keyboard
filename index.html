@@ -11,7 +11,6 @@
 /* IBM Plex Sans, trimmed (make-fonts.sh): with lang="bg" it draws the
    Bulgarian letter forms, which phones' own fonts lack */
 @font-face { font-family: "Plex"; font-weight: 400; font-style: normal; font-display: swap; src: url("fonts/IBMPlexSans-Regular.woff2") format("woff2"); }
-@font-face { font-family: "Plex"; font-weight: 400; font-style: italic; font-display: swap; src: url("fonts/IBMPlexSans-Italic.woff2") format("woff2"); }
 @font-face { font-family: "Plex"; font-weight: 600 700; font-style: normal; font-display: swap; src: url("fonts/IBMPlexSans-SemiBold.woff2") format("woff2"); }
 :root { --ink: #1d2433; --muted: #4a5263; --primary: #2c3a52; --line: #d0d0d0; --key: #fff; --keyline: #c9ced8; --usmark: #2f5fb3; }
 * { box-sizing: border-box; }
@@ -28,7 +27,6 @@ button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
 .checks { margin-right: auto; display: inline-flex; gap: 18px; }
 .check { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 0; font-size: 15px; cursor: pointer; user-select: none; }
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
-textarea.italic { font-style: italic; }
 /* Keyboard hidden: the text box takes the picture's place, its height and
    16px margin (the picture is as wide as main, 972 by 334), so the buttons
    stay where they were */
@@ -54,7 +52,7 @@ svg .label { fill: var(--muted); font-size: 14.5px; font-weight: 600; }
   svg#keyboard, .check.hide-option { display: none; }
   body.bare textarea { height: calc(7.5em + 28px); resize: vertical; }
 }
-/* A narrow screen: Italic on its own row, the four buttons sharing the
+/* A narrow screen: Hide keyboard on its own row, the four buttons sharing the
    next one, edge to edge (the owner, 2 November 2026) */
 @media (max-width: 600px) {
   .checks { flex-basis: 100%; }
@@ -90,7 +88,6 @@ footer a { color: var(--primary); }
 
 <div class="bar">
   <span class="checks">
-    <label class="check"><input id="italic" type="checkbox"> Italic</label>
     <label class="check hide-option"><input id="hide" type="checkbox"> Hide keyboard</label>
   </span>
   <button id="bulgarian" type="button" aria-pressed="true">Bulgarian</button>

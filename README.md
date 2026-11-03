@@ -16,12 +16,12 @@ Why this keyboard:
   middle of a word, Ctrl+Z undo.
 - The picture above the text box shows where every letter is, and its keys
   type when tapped.
-- Copy puts the text on the clipboard, in italic if you like, ready for an
+- Copy puts the text on the clipboard as plain text, ready for an
   email or a document.
 - The text stays in your browser for the next visit; nothing is ever sent
   anywhere.
 - The letters are Bulgarian: IBM Plex Sans draws the Bulgarian forms (д, л,
-  ж, the italic в, г, т, ш and others), which many phones' own fonts lack.
+  ж, к, т and others), which many phones' own fonts lack.
 
 - layout.js: the layout, one table; the page types with it and draws its
   picture from it.
@@ -37,7 +37,7 @@ Why this keyboard:
 - test.js: `node test.js` checks the layout, key by key.
 - test-browser.mjs: the page in a headless Chrome, typed into key by key.
 - check.sh: both; exit 0 when all pass.
-- make-fonts.sh: fonts/, IBM Plex Sans Regular, Italic and SemiBold trimmed
+- make-fonts.sh: fonts/, IBM Plex Sans Regular and SemiBold trimmed
   to Latin and Cyrillic, about 30 KB each (SIL Open Font License,
   fonts/license.txt).
 - build-zip.sh: ~/Projects/keyboard-update.zip, to unzip at the web space
