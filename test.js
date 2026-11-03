@@ -1,5 +1,5 @@
-// node test.js: the layout, checked against the owner's picture
-// (~/Projects/bulgarian-keyboard.png, 1 November 2026).
+// node test.js: the layout, checked key by key against the design of
+// 1 November 2026.
 "use strict";
 const assert = require("node:assert/strict");
 const { ROWS, TYPES, cyrillic } = require("./layout.js");

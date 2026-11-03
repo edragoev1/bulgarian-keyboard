@@ -1,5 +1,5 @@
 #!/bin/bash
-# The checks: the layout against the owner's picture, then the page in a
+# The checks: the layout key by key, then the page in a
 # headless Chrome, typed into key by key. Exit 0 when all pass.
 cd "$(dirname "$0")" || exit 1
 node test.js || exit 1
