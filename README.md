@@ -20,7 +20,8 @@ Why this keyboard:
   email or a document.
 - The text stays in your browser for the next visit; nothing is ever sent
   anywhere.
-- It uses your system's own font: no font is downloaded.
+- The letters are Bulgarian: IBM Plex Sans draws the Bulgarian forms (д, л,
+  ж, the italic в, г, т, ш and others), which many phones' own fonts lack.
 
 - layout.js: the layout, one table; the page types with it and draws its
   picture from it.
@@ -31,6 +32,9 @@ Why this keyboard:
 - test.js: `node test.js` checks the layout, key by key.
 - test-browser.mjs: the page in a headless Chrome, typed into key by key.
 - check.sh: both; exit 0 when all pass.
+- make-fonts.sh: fonts/, IBM Plex Sans Regular, Italic and SemiBold trimmed
+  to Latin and Cyrillic, about 30 KB each (SIL Open Font License,
+  fonts/license.txt).
 - build-zip.sh: ~/Projects/keyboard-update.zip, to unzip at the web space
   root (the site's folder is /keyboard); the scripts named with ?v= and
   their hash, as Cloudflare keeps .js files 4 hours in a browser.

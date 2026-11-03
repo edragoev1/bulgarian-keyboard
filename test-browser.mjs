@@ -198,6 +198,13 @@ await send("Emulation.clearDeviceMetricsOverride");
 await send("Emulation.setTouchEmulationEnabled", { enabled: false });
 await send("Emulation.setEmitTouchEventsForMouse", { enabled: false });
 await evaluate("localStorage.removeItem('bulgarian-keyboard-hide'); true");
+// IBM Plex Sans loaded, and drawing the Bulgarian forms: the same letters
+// are a different width with lang="bg" than with lang="ru"
+check(await evaluate(`(async () => { await document.fonts.ready; await document.fonts.load('italic 16px Plex', 'д');
+  const span=(lang, style)=>{ const e=document.createElement('span'); e.lang=lang; e.style.cssText='font: 40px Plex; position: absolute; white-space: pre;' + style; e.textContent='вгджзиклптцшщъью'; document.body.appendChild(e); const w=e.getBoundingClientRect().width; e.remove(); return w; };
+  return [document.fonts.check('16px Plex'), document.fonts.check('italic 16px Plex'), document.fonts.check('600 16px Plex'),
+    span('bg','') !== span('ru',''), span('bg','font-style: italic') !== span('ru','font-style: italic'), getComputedStyle(document.getElementById('text')).fontFamily.startsWith('Plex')].join(); })()`),
+  "true,true,true,true,true,true", "Plex Sans loaded, with the Bulgarian letter forms");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

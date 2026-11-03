@@ -12,6 +12,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir "$work/keyboard"
 cp -p layout.js keyboard.js .htaccess "$work/keyboard/"
+cp -pr fonts "$work/keyboard/"
 html=$(cat index.html)
 for js in layout.js keyboard.js; do
     v=$(sha256sum "$js" | cut -c1-10)
