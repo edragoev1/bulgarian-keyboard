@@ -43,6 +43,22 @@ svg .us { fill: var(--usmark); font-size: 14.5px; font-weight: 600; }
 svg .bg { fill: var(--ink); font-size: 20px; font-weight: 600; }
 svg .sh { fill: var(--muted); font-size: 18px; }
 svg .label { fill: var(--muted); font-size: 14.5px; font-weight: 600; }
+/* A phone or tablet: no picture and no Hide keyboard, the device's own
+   keyboard types (the owner, 2 November 2026) */
+@media (pointer: coarse) {
+  svg#keyboard, .check.hide-option { display: none; }
+  body.bare textarea { height: calc(7.5em + 28px); resize: vertical; }
+}
+/* A narrow screen: Italic on its own row, the four buttons sharing the
+   next one, edge to edge (the owner, 2 November 2026) */
+@media (max-width: 600px) {
+  .checks { flex-basis: 100%; }
+  .bar button { flex: 1 1 0; width: auto; min-width: 0; font-size: 14px; }
+}
+/* The smallest phones, 320 pixels: "Bulgarian" fits its quarter */
+@media (max-width: 359px) {
+  .bar button { font-size: 13px; }
+}
 footer { margin-top: 20px; color: var(--muted); font-size: 13px; }
 footer a { color: var(--primary); }
 </style>
@@ -59,7 +75,7 @@ footer a { color: var(--primary); }
 <div class="bar">
   <span class="checks">
     <label class="check"><input id="italic" type="checkbox"> Italic</label>
-    <label class="check"><input id="hide" type="checkbox"> Hide keyboard</label>
+    <label class="check hide-option"><input id="hide" type="checkbox"> Hide keyboard</label>
   </span>
   <button id="bulgarian" type="button" aria-pressed="true">Bulgarian</button>
   <button id="english" type="button" aria-pressed="false">English</button>
