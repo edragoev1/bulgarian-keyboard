@@ -147,26 +147,25 @@ check(await evaluate("(() => { const t=document.getElementById('text'); t.value=
 // Italic at the left edge of the text box, the buttons ending at its right edge
 check(await evaluate("(() => { const t=document.getElementById('text').getBoundingClientRect(); const c=document.getElementById('italic').getBoundingClientRect(); const b=document.getElementById('copy').getBoundingClientRect(); return Math.round(c.left - t.left) + ',' + Math.round(t.right - b.right); })()"), "0,0", "Italic left, buttons right, edges aligned");
 check(await evaluate("[...document.querySelectorAll('.bar button')].map(b => b.id).join(',')"), "bulgarian,english,clear,copy", "the order of the buttons");
-// Hide keyboard: the picture gone, the text box moved up, kept; and back
-check(await evaluate(`(() => { const k=document.getElementById('keyboard'); const t=document.getElementById('text'); const top=t.getBoundingClientRect().top;
+// Hide keyboard: the picture gone, the text box in its place, the buttons
+// not moved; kept; and back
+const barAt = "Math.round(document.querySelector('.bar').getBoundingClientRect().top * 10) / 10";
+check(await evaluate(`(() => { const k=document.getElementById('keyboard'); const t=document.getElementById('text'); const top=t.getBoundingClientRect().top; const bar=${barAt};
   document.getElementById('hide').click(); const gone=k.getBoundingClientRect().height===0 && t.getBoundingClientRect().top < top - 200;
-  const kept=localStorage.getItem('bulgarian-keyboard-hide'); const focused=document.activeElement===t;
-  document.getElementById('hide').click(); return [gone, kept, focused, k.getBoundingClientRect().height > 200, t.getBoundingClientRect().top===top, localStorage.getItem('bulgarian-keyboard-hide')].join(); })()`),
-  "true,1,true,true,true,0", "Hide keyboard: hidden, kept, focus in the text box; shown again");
+  const same=${barAt}===bar; const kept=localStorage.getItem('bulgarian-keyboard-hide'); const focused=document.activeElement===t;
+  document.getElementById('hide').click(); return [gone, same, kept, focused, k.getBoundingClientRect().height > 200, t.getBoundingClientRect().top===top, ${barAt}===bar, localStorage.getItem('bulgarian-keyboard-hide')].join(); })()`),
+  "true,true,1,true,true,true,true,0", "Hide keyboard: hidden, the buttons not moved, kept, focus; shown again");
+// The same in a narrow window, where the picture is smaller
+await send("Emulation.setDeviceMetricsOverride", { width: 640, height: 700, deviceScaleFactor: 1, mobile: false });
+await sleep(200);
+check(await evaluate(`(() => { const bar=${barAt}; document.getElementById('hide').click(); const after=${barAt}; document.getElementById('hide').click(); return [bar===after, ${barAt}===bar].join(); })()`), "true,true", "the buttons not moved in a narrow window");
+await send("Emulation.clearDeviceMetricsOverride");
+await sleep(200);
 // Kept for the next visit: hidden after a reload
 await evaluate("localStorage.setItem('bulgarian-keyboard-hide', '1'); true");
 await send("Page.reload");
 await sleep(1500);
 check(await evaluate("[document.getElementById('hide').checked, document.getElementById('keyboard').getBoundingClientRect().height].join()"), "true,0", "Hide keyboard kept after a reload");
-// Hidden: the text box fills the window, to the footer's 40px at the bottom, and the page does not scroll; at two window heights
-const fills = () => evaluate(`(() => { const f=document.querySelector('footer').getBoundingClientRect(); const e=document.documentElement;
-  return [Math.round(innerHeight - f.bottom), e.scrollHeight <= innerHeight, document.getElementById('text').getBoundingClientRect().height > 300].join(); })()`);
-check(await fills(), "40,true,true", "Hide keyboard: the text box fills the window, no page scroll bar");
-await send("Emulation.setDeviceMetricsOverride", { width: 1100, height: 600, deviceScaleFactor: 1, mobile: false });
-await sleep(200);
-check(await evaluate(`(() => { const f=document.querySelector('footer').getBoundingClientRect(); return [Math.round(innerHeight - f.bottom), document.documentElement.scrollHeight <= innerHeight].join(); })()`), "40,true", "the same in a lower window");
-await send("Emulation.clearDeviceMetricsOverride");
-await sleep(200);
 const hiddenShot = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot.replace(/\.png$/, "-hidden.png"), Buffer.from(hiddenShot.result.data, "base64"));
 await evaluate("localStorage.removeItem('bulgarian-keyboard-hide'); true");

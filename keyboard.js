@@ -88,7 +88,8 @@ try {
 } catch {
     // Storage refused
 }
-// The text box then fills the window (the owner, 2 November 2026)
+// The text box then takes the picture's place, so the buttons do not move
+// (the owner, 2 November 2026)
 function showKeyboard() {
     document.getElementById("keyboard").toggleAttribute("hidden", hide.checked);
     document.body.classList.toggle("bare", hide.checked);
