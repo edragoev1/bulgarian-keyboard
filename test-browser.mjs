@@ -147,6 +147,20 @@ check(await evaluate("(() => { const t=document.getElementById('text'); t.value=
 // Italic at the left edge of the text box, the buttons ending at its right edge
 check(await evaluate("(() => { const t=document.getElementById('text').getBoundingClientRect(); const c=document.getElementById('italic').getBoundingClientRect(); const b=document.getElementById('copy').getBoundingClientRect(); return Math.round(c.left - t.left) + ',' + Math.round(t.right - b.right); })()"), "0,0", "Italic left, buttons right, edges aligned");
 check(await evaluate("[...document.querySelectorAll('.bar button')].map(b => b.id).join(',')"), "bulgarian,english,clear,copy", "the order of the buttons");
+// Hide keyboard: the picture gone, the text box moved up, kept; and back
+check(await evaluate(`(() => { const k=document.getElementById('keyboard'); const t=document.getElementById('text'); const top=t.getBoundingClientRect().top;
+  document.getElementById('hide').click(); const gone=k.getBoundingClientRect().height===0 && t.getBoundingClientRect().top < top - 200;
+  const kept=localStorage.getItem('bulgarian-keyboard-hide'); const focused=document.activeElement===t;
+  document.getElementById('hide').click(); return [gone, kept, focused, k.getBoundingClientRect().height > 200, t.getBoundingClientRect().top===top, localStorage.getItem('bulgarian-keyboard-hide')].join(); })()`),
+  "true,1,true,true,true,0", "Hide keyboard: hidden, kept, focus in the text box; shown again");
+// Kept for the next visit: hidden after a reload
+await evaluate("localStorage.setItem('bulgarian-keyboard-hide', '1'); true");
+await send("Page.reload");
+await sleep(1500);
+check(await evaluate("[document.getElementById('hide').checked, document.getElementById('keyboard').getBoundingClientRect().height].join()"), "true,0", "Hide keyboard kept after a reload");
+const hiddenShot = await send("Page.captureScreenshot", { format: "png" });
+fs.writeFileSync(shot.replace(/\.png$/, "-hidden.png"), Buffer.from(hiddenShot.result.data, "base64"));
+await evaluate("localStorage.removeItem('bulgarian-keyboard-hide'); true");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

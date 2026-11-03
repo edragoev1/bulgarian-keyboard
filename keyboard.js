@@ -79,6 +79,26 @@ italic.addEventListener("change", () => {
     text.focus();
 });
 
+// Hide keyboard: the picture out of the way, for those who type without
+// looking (the owner, 2 November 2026); kept for the next visit
+const hide = document.getElementById("hide");
+const HIDE = "bulgarian-keyboard-hide";
+try {
+    hide.checked = localStorage.getItem(HIDE) === "1";
+} catch {
+    // Storage refused
+}
+document.getElementById("keyboard").toggleAttribute("hidden", hide.checked);
+hide.addEventListener("change", () => {
+    document.getElementById("keyboard").toggleAttribute("hidden", hide.checked);
+    try {
+        localStorage.setItem(HIDE, hide.checked ? "1" : "0");
+    } catch {
+        // As above
+    }
+    text.focus();
+});
+
 // copyText puts the text on the clipboard: plain, and in italic also as HTML,
 // which an email window pastes in italic (one that takes plain text alone
 // pastes the plain); where the browser cannot write HTML, plain alone

@@ -20,9 +20,11 @@ textarea:focus { outline: none; border-color: var(--primary); }
 button { width: 112px; height: 36px; padding: 0; font: inherit; font-size: 15px; border-radius: 6px; cursor: pointer; border: 2px solid var(--primary); background: #fff; color: var(--primary); }
 button.primary { background: var(--primary); color: #fff; }
 button[aria-pressed="false"] { border-color: var(--line); color: var(--muted); }
-.check { margin-right: auto; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 0; font-size: 15px; cursor: pointer; user-select: none; }
+.checks { margin-right: auto; display: inline-flex; gap: 18px; }
+.check { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 0; font-size: 15px; cursor: pointer; user-select: none; }
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
 textarea.italic { font-style: italic; }
+svg[hidden] { display: none; }
 svg { display: block; width: 100%; height: auto; margin: 0 0 16px; user-select: none; -webkit-user-select: none; }
 svg .k rect { fill: var(--key); stroke: var(--keyline); }
 svg .k.mod rect { fill: #dfe3ea; }
@@ -50,7 +52,10 @@ footer a { color: var(--primary); }
 <textarea id="text" lang="bg" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Your text"></textarea>
 
 <div class="bar">
-  <label class="check"><input id="italic" type="checkbox"> Italic</label>
+  <span class="checks">
+    <label class="check"><input id="italic" type="checkbox"> Italic</label>
+    <label class="check"><input id="hide" type="checkbox"> Hide keyboard</label>
+  </span>
   <button id="bulgarian" type="button" aria-pressed="true">Bulgarian</button>
   <button id="english" type="button" aria-pressed="false">English</button>
   <button id="clear" type="button">Clear</button>
