@@ -91,14 +91,14 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.
   const by=(name)=>keys.find(g=>g.getAttribute('aria-label')===name);
   const tap=(g)=>g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
   tap(by('Caps Lock')); tap(by('а')); tap(by('б'));
-  tap(by('Shift for the next key')); tap(by('в'));
+  tap(by('Shift for the next key')); tap(by('в')); tap(by('г'));
   tap(by('1, with Shift !'));
-  tap(by('Caps Lock')); tap(by('г'));
   tap(by('Enter')); tap(by('д')); tap(by('е'));
   tap(by('Backspace'));
   tap(by('Tab'));
   return true; })()`);
-check(await value(), "АБв1г\nд\t", "Caps Lock, Shift with it, Enter, Backspace, Tab tapped");
+check(await value(), "абВг1\nд\t", "Caps Lock disabled; Shift, Enter, Backspace, Tab tapped");
+check(await evaluate("[...document.querySelectorAll('#keyboard g.k.off')].some(g => g.getAttribute('aria-label') === 'Caps Lock')"), true, "Caps Lock shown disabled");
 // The real Caps Lock: the browser sends the capital, which types the Cyrillic capital
 await evaluate("(() => { const t=document.getElementById('text'); t.value=''; t.focus(); return true; })()");
 await send("Input.dispatchKeyEvent", { type: "keyDown", text: "Q", unmodifiedText: "Q", key: "Q", modifiers: 0 });
@@ -107,23 +107,6 @@ await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Ent
 await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
 await typeText("w");
 check(await value(), "Я\nж", "the real Caps Lock and Enter");
-// Caps Lock where the browser does not report it (Chrome under Wayland): the
-// letter key tells it, "X" without Shift; then X types Ь, Shift+X Ѝ, [ Ш, and
-// a click on the picture's X Ь (the owner, 3 November 2026)
-async function code(ch, keyCode, shift) {
-    await send("Input.dispatchKeyEvent", { type: "keyDown", text: ch, unmodifiedText: ch, key: ch, code: keyCode, modifiers: shift ? 8 : 0 });
-    await send("Input.dispatchKeyEvent", { type: "keyUp", key: ch, code: keyCode, modifiers: shift ? 8 : 0 });
-}
-await evaluate("(() => { const t=document.getElementById('text'); t.value=''; t.focus(); return true; })()");
-await code("X", "KeyX", false);
-await code("x", "KeyX", true);
-await code("[", "BracketLeft", false);
-await evaluate(`(() => { const g=[...document.querySelectorAll('#keyboard g.k')].find(g=>g.getAttribute('aria-label')==='ь, with Shift ѝ');
-  g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true})); return true; })()`);
-check(await value(), "ЬЍШЬ", "Caps Lock told by a letter key: X, Shift+X, [, a click on X");
-// Caps Lock off again, as a small letter without Shift tells
-await code("x", "KeyX", false);
-check(await value(), "ЬЍШЬь", "Caps Lock off, told by a small letter");
 await evaluate("document.getElementById('text').value='Васил чете шопска салата. „Здравей!“'; true");
 const shotData = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot, Buffer.from(shotData.result.data, "base64"));
@@ -142,7 +125,7 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value='x'; t
   for (const g of document.querySelectorAll('#keyboard g.k.off')) g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
   return true; })()`);
 check(await value(), "x", "the disabled keys type nothing");
-check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 7, "seven disabled keys");
+check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 8, "eight disabled keys: the bottom row's seven and Caps Lock");
 // Copy: plain text alone
 await send("Browser.grantPermissions", { origin: new URL(url).origin, permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"] });
 await evaluate("document.getElementById('text').value='Пиши <ми>\\nдве'; document.getElementById('copy').click(); true");

@@ -37,34 +37,11 @@ function insert(s) {
 
 // A character typed: what the layout makes of it. A Cyrillic character, as
 // insert's own, is not on the US keyboard, and goes through as it is.
-// The real Caps Lock, as the last key pressed or let go anywhere on the page
-// says: an input event does not carry it, and Chrome on Linux does not give
-// it with a click (the owner, 3 November 2026: Caps Lock on, the X of the
-// picture clicked, typed ь)
-// Where the browser does not say it either (Chrome under Wayland gives false),
-// a letter key tells it: "X" without Shift, or "x" with it, means Caps Lock
-// is on; and the Caps Lock key itself switches it.
-let capsLockOn = false;
-window.addEventListener("keydown", (e) => {
-    if (e.key === "CapsLock") {
-        capsLockOn = !capsLockOn;
-    } else if (/^Key[A-Z]$/.test(e.code) && /^[a-zA-Z]$/.test(e.key)) {
-        capsLockOn = (e.key === e.key.toUpperCase()) !== e.shiftKey;
-    } else if (e.getModifierState && e.getModifierState("CapsLock")) {
-        capsLockOn = true;
-    }
-});
-window.addEventListener("keyup", (e) => {
-    // Let go, the key's state is the browser's, when it gives one
-    if (e.key === "CapsLock" && e.getModifierState && e.getModifierState("CapsLock")) {
-        capsLockOn = true;
-    }
-});
 text.addEventListener("beforeinput", (e) => {
     if (!bulgarian || e.inputType !== "insertText" || !e.data) {
         return;
     }
-    const typed = cyrillic(e.data, capsLockOn);
+    const typed = cyrillic(e.data);
     if (typed !== e.data) {
         e.preventDefault();
         insert(typed);
@@ -159,12 +136,21 @@ function label(g, x, y, cls, s, anchor = "start") {
 }
 
 const shiftKeys = [];
-let capsKey = null;
-let capsLock = false;
 
 // The keys of the picture that are not characters: Shift for the next key,
-// Caps Lock until tapped again, and the three that edit
+// and the three that edit. Caps Lock is shown, and plainly disabled, as the
+// bottom row's: browsers do not all say when the real one is on, so it could
+// not work everywhere (the owner, 3 November 2026: "gray out the caps lock
+// and focus on the other keys to work 100%"); Shift types the capitals.
 function modifier(x, y, w, name) {
+    if (name === "Caps Lock") {
+        const off = el("g", { class: "k off", role: "button", "aria-label": name, "aria-disabled": "true" }, keyboard);
+        el("rect", { x, y, width: w * U - GAP, height: U - GAP, rx: 7 }, off);
+        label(off, x + (w * U - GAP) / 2, y + U / 2 + 4, "label", name, "middle");
+        // The text box keeps the caret, and nothing happens
+        off.addEventListener("pointerdown", (e) => e.preventDefault());
+        return;
+    }
     const g = el("g", { class: "k mod", role: "button" }, keyboard);
     el("rect", { x, y, width: w * U - GAP, height: U - GAP, rx: 7 }, g);
     label(g, x + (w * U - GAP) / 2, y + U / 2 + 4, "label", name, "middle");
@@ -173,9 +159,6 @@ function modifier(x, y, w, name) {
         shiftKeys.push(g);
         g.setAttribute("aria-label", "Shift for the next key");
     }
-    if (name === "Caps Lock") {
-        capsKey = g;
-    }
     g.addEventListener("pointerdown", (e) => {
         // The text box keeps the caret
         e.preventDefault();
@@ -183,10 +166,6 @@ function modifier(x, y, w, name) {
             case "Shift":
                 shiftOnce = !shiftOnce;
                 shiftKeys.forEach((s) => s.classList.toggle("on", shiftOnce));
-                break;
-            case "Caps Lock":
-                capsLock = !capsLock;
-                capsKey.classList.toggle("on", capsLock);
                 break;
             case "Enter":
                 insert("\n");
@@ -238,19 +217,11 @@ ROWS.forEach((row, r) => {
         g.addEventListener("pointerdown", (e) => {
             // The text box keeps the caret
             e.preventDefault();
-            // Caps Lock makes a letter a capital, and Shift with it a small
-            // one again, as on a keyboard; the other keys only Shift changes
-            // The real Shift and Caps Lock held while clicking count as the
-            // picture's own do (the owner: Shift held and the key of ѝ gave ь)
+            // Shift types the capital or the second character; the real
+            // Shift held while clicking counts as the picture's own does (the
+            // owner: Shift held and the key of ѝ gave ь)
             const shift = shiftOnce || e.shiftKey;
-            const caps = capsLock || capsLockOn || e.getModifierState("CapsLock");
-            const upper = letter && caps ? !shift : shift;
-            // The X of ь and ѝ: Caps Lock makes either a capital, Ь or Ѝ
-            if (!letter && caps && /\p{L}/u.test(bg)) {
-                insert((shift ? bgShift : bg).toUpperCase());
-            } else {
-                insert(upper ? bgShift : bg);
-            }
+            insert(shift ? bgShift : bg);
             if (shiftOnce) {
                 shiftOnce = false;
                 shiftKeys.forEach((s) => s.classList.remove("on"));
