@@ -18,7 +18,7 @@ for (const [us, bg] of Object.entries(want)) {
 }
 
 // The 30 letters of the Bulgarian alphabet, each on a key, small and capital
-// (Ь has no capital on the keyboard: Shift+X is the small ѝ)
+// (Ь with Caps Lock: Shift+X is the small ѝ)
 const alphabet = "абвгдежзийклмнопрстуфхцчшщъьюя";
 const typed = new Set(TYPES.values());
 for (const letter of alphabet) {
@@ -27,6 +27,19 @@ for (const letter of alphabet) {
         assert.ok(typed.has(letter.toUpperCase()), letter.toUpperCase());
     }
 }
+
+// Caps Lock: the browser sends "X" for the key alone and "x" with Shift, and
+// punctuation as it is; X types Ь, Shift+X Ѝ, the keys of ш щ ю ч their
+// capitals, and Shift with Caps Lock the small ones
+assert.equal(cyrillic("X", true), "Ь");
+assert.equal(cyrillic("x", true), "Ѝ");
+assert.equal(cyrillic("[OFXOR", true), "ШОФЬОР");
+assert.equal(cyrillic("A", true), "А");
+assert.equal(cyrillic("[]\\`", true), "ШЩЮЧ");
+assert.equal(cyrillic("{}|~", true), "шщюч");
+assert.equal(cyrillic("[]\\`"), "шщюч");
+assert.equal(cyrillic("x"), "ь");
+assert.equal(cyrillic("X"), "ѝ");
 
 // No US character is on two keys, and no two keys type the same
 const us = ROWS.flat().flatMap((k) => [k[0], k[1]]);

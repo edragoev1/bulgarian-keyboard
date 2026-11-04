@@ -37,11 +37,18 @@ function insert(s) {
 
 // A character typed: what the layout makes of it. A Cyrillic character, as
 // insert's own, is not on the US keyboard, and goes through as it is.
+// Caps Lock, as the last key pressed or let go says: an input event does not
+let capsLockOn = false;
+for (const name of ["keydown", "keyup"]) {
+    text.addEventListener(name, (e) => {
+        capsLockOn = e.getModifierState("CapsLock");
+    });
+}
 text.addEventListener("beforeinput", (e) => {
     if (!bulgarian || e.inputType !== "insertText" || !e.data) {
         return;
     }
-    const typed = cyrillic(e.data);
+    const typed = cyrillic(e.data, capsLockOn);
     if (typed !== e.data) {
         e.preventDefault();
         insert(typed);
@@ -222,7 +229,12 @@ ROWS.forEach((row, r) => {
             const shift = shiftOnce || e.shiftKey;
             const caps = capsLock || e.getModifierState("CapsLock");
             const upper = letter && caps ? !shift : shift;
-            insert(upper ? bgShift : bg);
+            // The X of ь and ѝ: Caps Lock makes either a capital, Ь or Ѝ
+            if (!letter && caps && /\p{L}/u.test(bg)) {
+                insert((shift ? bgShift : bg).toUpperCase());
+            } else {
+                insert(upper ? bgShift : bg);
+            }
             if (shiftOnce) {
                 shiftOnce = false;
                 shiftKeys.forEach((s) => s.classList.remove("on"));
