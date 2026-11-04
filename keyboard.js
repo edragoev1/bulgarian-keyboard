@@ -41,14 +41,25 @@ function insert(s) {
 // says: an input event does not carry it, and Chrome on Linux does not give
 // it with a click (the owner, 3 November 2026: Caps Lock on, the X of the
 // picture clicked, typed ь)
+// Where the browser does not say it either (Chrome under Wayland gives false),
+// a letter key tells it: "X" without Shift, or "x" with it, means Caps Lock
+// is on; and the Caps Lock key itself switches it.
 let capsLockOn = false;
-for (const name of ["keydown", "keyup"]) {
-    window.addEventListener(name, (e) => {
-        if (e.getModifierState) {
-            capsLockOn = e.getModifierState("CapsLock");
-        }
-    });
-}
+window.addEventListener("keydown", (e) => {
+    if (e.key === "CapsLock") {
+        capsLockOn = !capsLockOn;
+    } else if (/^Key[A-Z]$/.test(e.code) && /^[a-zA-Z]$/.test(e.key)) {
+        capsLockOn = (e.key === e.key.toUpperCase()) !== e.shiftKey;
+    } else if (e.getModifierState && e.getModifierState("CapsLock")) {
+        capsLockOn = true;
+    }
+});
+window.addEventListener("keyup", (e) => {
+    // Let go, the key's state is the browser's, when it gives one
+    if (e.key === "CapsLock" && e.getModifierState && e.getModifierState("CapsLock")) {
+        capsLockOn = true;
+    }
+});
 text.addEventListener("beforeinput", (e) => {
     if (!bulgarian || e.inputType !== "insertText" || !e.data) {
         return;

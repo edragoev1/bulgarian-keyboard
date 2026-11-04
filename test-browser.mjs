@@ -107,6 +107,23 @@ await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Ent
 await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
 await typeText("w");
 check(await value(), "Я\nж", "the real Caps Lock and Enter");
+// Caps Lock where the browser does not report it (Chrome under Wayland): the
+// letter key tells it, "X" without Shift; then X types Ь, Shift+X Ѝ, [ Ш, and
+// a click on the picture's X Ь (the owner, 3 November 2026)
+async function code(ch, keyCode, shift) {
+    await send("Input.dispatchKeyEvent", { type: "keyDown", text: ch, unmodifiedText: ch, key: ch, code: keyCode, modifiers: shift ? 8 : 0 });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", key: ch, code: keyCode, modifiers: shift ? 8 : 0 });
+}
+await evaluate("(() => { const t=document.getElementById('text'); t.value=''; t.focus(); return true; })()");
+await code("X", "KeyX", false);
+await code("x", "KeyX", true);
+await code("[", "BracketLeft", false);
+await evaluate(`(() => { const g=[...document.querySelectorAll('#keyboard g.k')].find(g=>g.getAttribute('aria-label')==='ь, with Shift ѝ');
+  g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true})); return true; })()`);
+check(await value(), "ЬЍШЬ", "Caps Lock told by a letter key: X, Shift+X, [, a click on X");
+// Caps Lock off again, as a small letter without Shift tells
+await code("x", "KeyX", false);
+check(await value(), "ЬЍШЬь", "Caps Lock off, told by a small letter");
 await evaluate("document.getElementById('text').value='Васил чете шопска салата. „Здравей!“'; true");
 const shotData = await send("Page.captureScreenshot", { format: "png" });
 fs.writeFileSync(shot, Buffer.from(shotData.result.data, "base64"));
