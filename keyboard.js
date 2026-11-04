@@ -37,11 +37,16 @@ function insert(s) {
 
 // A character typed: what the layout makes of it. A Cyrillic character, as
 // insert's own, is not on the US keyboard, and goes through as it is.
-// Caps Lock, as the last key pressed or let go says: an input event does not
+// The real Caps Lock, as the last key pressed or let go anywhere on the page
+// says: an input event does not carry it, and Chrome on Linux does not give
+// it with a click (the owner, 3 November 2026: Caps Lock on, the X of the
+// picture clicked, typed ь)
 let capsLockOn = false;
 for (const name of ["keydown", "keyup"]) {
-    text.addEventListener(name, (e) => {
-        capsLockOn = e.getModifierState("CapsLock");
+    window.addEventListener(name, (e) => {
+        if (e.getModifierState) {
+            capsLockOn = e.getModifierState("CapsLock");
+        }
     });
 }
 text.addEventListener("beforeinput", (e) => {
@@ -227,7 +232,7 @@ ROWS.forEach((row, r) => {
             // The real Shift and Caps Lock held while clicking count as the
             // picture's own do (the owner: Shift held and the key of ѝ gave ь)
             const shift = shiftOnce || e.shiftKey;
-            const caps = capsLock || e.getModifierState("CapsLock");
+            const caps = capsLock || capsLockOn || e.getModifierState("CapsLock");
             const upper = letter && caps ? !shift : shift;
             // The X of ь and ѝ: Caps Lock makes either a capital, Ь or Ѝ
             if (!letter && caps && /\p{L}/u.test(bg)) {
