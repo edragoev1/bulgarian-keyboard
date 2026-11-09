@@ -10,6 +10,10 @@ const englishButton = document.getElementById("english");
 const STORE = "bulgarian-keyboard-text";
 let bulgarian = true;
 let shiftOnce = false;
+// The picture's AltGr, for the next key tapped
+let altOnce = false;
+// The right Alt held, which is AltGr where the system does not say so
+let rightAlt = false;
 
 // The text of the last visit
 try {
@@ -46,6 +50,33 @@ text.addEventListener("beforeinput", (e) => {
         e.preventDefault();
         insert(typed);
     }
+});
+
+// AltGr with a key: the quotes, the dash and the euro (ALTGR), in Bulgarian.
+// The key is known by its place (e.code), as AltGr changes what it types.
+const KEY_OF_CODE = { Comma: ",", Period: ".", Minus: "-", Digit5: "5", KeyE: "e" };
+document.addEventListener("keydown", (e) => {
+    if (e.code === "AltRight") {
+        rightAlt = true;
+        return;
+    }
+    const altGr = (e.getModifierState && e.getModifierState("AltGraph")) || (e.ctrlKey && e.altKey) || rightAlt;
+    if (!bulgarian || !altGr || document.activeElement !== text) {
+        return;
+    }
+    const made = ALTGR.get(KEY_OF_CODE[e.code]);
+    if (made) {
+        e.preventDefault();
+        insert(made);
+    }
+});
+document.addEventListener("keyup", (e) => {
+    if (e.code === "AltRight") {
+        rightAlt = false;
+    }
+});
+window.addEventListener("blur", () => {
+    rightAlt = false;
 });
 
 // Bulgarian or English: two buttons, the one in use pressed (the owner: no
@@ -136,6 +167,7 @@ function label(g, x, y, cls, s, anchor = "start") {
 }
 
 const shiftKeys = [];
+const altKeys = [];
 
 // The keys of the picture that are not characters: Shift for the next key,
 // and the three that edit. Caps Lock is shown, and plainly disabled, as the
@@ -214,9 +246,24 @@ ROWS.forEach((row, r) => {
             label(g, x + (w - GAP) / 2 + 8, y + 26, "sh", bgShift, "middle");
             label(g, x + (w - GAP) / 2 + 8, y + 50, "bg", bg, "middle");
         }
+        // AltGr's character small at the bottom left, under the US key's,
+        // where the key has room beside its own characters
+        const alt = ALTGR.get(us);
+        if (alt) {
+            g.setAttribute("aria-label", g.getAttribute("aria-label") + ", with AltGr " + alt);
+            label(g, x + 6, y + U - GAP - 7, "ag", alt);
+        }
         g.addEventListener("pointerdown", (e) => {
             // The text box keeps the caret
             e.preventDefault();
+            if (altOnce) {
+                // The picture's AltGr: the key's AltGr character, or the
+                // key's own where it has none
+                insert(alt || bg);
+                altOnce = false;
+                altKeys.forEach((a) => a.classList.remove("on"));
+                return;
+            }
             // Shift types the capital or the second character; the real
             // Shift held while clicking counts as the picture's own does (the
             // owner: Shift held and the key of ѝ gave ь)
@@ -236,11 +283,22 @@ ROWS.forEach((row, r) => {
 // The bottom row: the space bar, and the keys a page cannot use, shown so that
 // the picture is a whole keyboard, and plainly disabled (the owner, 2 November
 // 2026)
-const BOTTOM = [["Ctrl", 1.5], ["Super", 1.25], ["Alt", 1.25], [" ", 6], ["Alt", 1.25], ["Super", 1.25], ["Menu", 1.25], ["Ctrl", 1.25]];
+// The right Alt is AltGr, tapped for the next key, as Shift is
+const BOTTOM = [["Ctrl", 1.5], ["Super", 1.25], ["Alt", 1.25], [" ", 6], ["AltGr", 1.25], ["Super", 1.25], ["Menu", 1.25], ["Ctrl", 1.25]];
 let bottomX = 6;
 const bottomY = 4 * U + 6;
 for (const [name, w] of BOTTOM) {
-    if (name === " ") {
+    if (name === "AltGr") {
+        const g = el("g", { class: "k mod", role: "button", "aria-label": "AltGr for the next key" }, keyboard);
+        el("rect", { x: bottomX, y: bottomY, width: w * U - GAP, height: U - GAP, rx: 7 }, g);
+        label(g, bottomX + (w * U - GAP) / 2, bottomY + U / 2 + 4, "label", name, "middle");
+        altKeys.push(g);
+        g.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            altOnce = !altOnce;
+            altKeys.forEach((a) => a.classList.toggle("on", altOnce));
+        });
+    } else if (name === " ") {
         const space = el("g", { class: "k", role: "button", "aria-label": "Space" }, keyboard);
         el("rect", { x: bottomX, y: bottomY, width: w * U - GAP, height: U - GAP, rx: 7 }, space);
         space.addEventListener("pointerdown", (e) => {

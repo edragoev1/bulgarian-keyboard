@@ -1,5 +1,7 @@
-// The Bulgarian Phonetic Keyboard: traditional phonetic on a US keyboard,
-// with one change, В on V and Ж on W (the owner, 1 November 2026). This table
+// The Bulgarian Phonetic Keyboard: Microsoft's Bulgarian (Phonetic
+// Traditional) on a US keyboard, with one change, В on V and Ж on W (the
+// owner, 1 November 2026); the Bulgarian quotes and the dash with AltGr
+// (ALTGR below). This table
 // is the layout: the page types with it and draws its picture from it, so the
 // two never disagree.
 //
@@ -14,7 +16,7 @@ const ROWS = [
         ["1", "!", "1", "!"], ["2", "@", "2", "@"], ["3", "#", "3", "№"],
         ["4", "$", "4", "$"], ["5", "%", "5", "%"], ["6", "^", "6", "€"],
         ["7", "&", "7", "§"], ["8", "*", "8", "*"], ["9", "(", "9", "("],
-        ["0", ")", "0", ")"], ["-", "_", "-", "–"], ["=", "+", "=", "+"],
+        ["0", ")", "0", ")"], ["-", "_", "-", "_"], ["=", "+", "=", "+"],
     ],
     [
         ["q", "Q", "я", "Я"], ["w", "W", "ж", "Ж"], ["e", "E", "е", "Е"],
@@ -32,7 +34,7 @@ const ROWS = [
     [
         ["z", "Z", "з", "З"], ["x", "X", "ь", "ѝ"], ["c", "C", "ц", "Ц"],
         ["v", "V", "в", "В"], ["b", "B", "б", "Б"], ["n", "N", "н", "Н"],
-        ["m", "M", "м", "М"], [",", "<", ",", "„"], [".", ">", ".", "“"],
+        ["m", "M", "м", "М"], [",", "<", ",", "<"], [".", ">", ".", ">"],
         ["/", "?", "/", "?"],
     ],
 ];
@@ -49,6 +51,11 @@ for (const row of ROWS) {
     }
 }
 
+// AltGr (the right Alt, or Ctrl+Alt as on Windows) with a key: the
+// Bulgarian quotes „ and “ on comma and period, the dash – on minus, and the
+// euro on 5 and E, as PDFjet Write has them
+const ALTGR = new Map([[",", "„"], [".", "“"], ["-", "–"], ["5", "€"], ["e", "€"]]);
+
 // cyrillic returns the text typed on the US keyboard as this layout types it;
 // any character not on it, a space, a line break or a Cyrillic letter, as it
 // is.
@@ -61,5 +68,5 @@ function cyrillic(text) {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { ROWS, TYPES, cyrillic };
+    module.exports = { ROWS, TYPES, ALTGR, cyrillic };
 }

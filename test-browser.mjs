@@ -47,6 +47,12 @@ async function key(ch) {
     await send("Input.dispatchKeyEvent", { type: "keyUp", key: ch, modifiers: shifted ? 8 : 0 });
 }
 async function typeText(s) { for (const ch of s) await key(ch); }
+// A key with AltGr, as Windows sends it, Ctrl and Alt: by its place, as AltGr
+// changes what it types
+async function altGr(code, k) {
+    await send("Input.dispatchKeyEvent", { type: "rawKeyDown", code, key: k, modifiers: 3 });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", code, key: k, modifiers: 3 });
+}
 const value = () => evaluate("document.getElementById('text').value");
 let fail = 0;
 const check = (got, want, what) => { if (got !== want) { fail++; console.log(`FAIL ${what}: ${JSON.stringify(got)} want ${JSON.stringify(want)}`); } else console.log(`PASS ${what}`); };
@@ -55,8 +61,11 @@ check(focusOnLoad, "true,7,7", "the focus in the text box on load, the caret at 
 
 await typeText("Vasil `ete [opska");
 check(await value(), "Васил чете шопска", "typing in Bulgarian");
-await typeText(" <Zdravej!>");
-check(await value(), "Васил чете шопска „Здравей!“", "Shift symbols");
+await typeText(" ");
+await altGr("Comma", ",");
+await typeText("Zdravej!");
+await altGr("Period", ".");
+check(await value(), "Васил чете шопска „Здравей!“", "AltGr quotes");
 // Esc no longer switches (the owner); the buttons do
 await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
 await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
@@ -83,12 +92,25 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.
   tap(keys.find(g=>g.getAttribute('aria-label')==='ш'));
   return true; })()`);
 check(await value(), "ѝш", "tapping the keys, Shift once");
+// The picture's AltGr, then the keys of comma, of minus and of period: „–“;
+// the key of comma alone after it: a comma
+await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.focus();
+  const keys=[...document.querySelectorAll('#keyboard g.k')];
+  const by=(name)=>keys.find(g=>g.getAttribute('aria-label')===name);
+  const tap=(g)=>g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
+  tap(by('AltGr for the next key')); tap(by(',, with Shift <, with AltGr „'));
+  tap(by('AltGr for the next key')); tap(by('-, with Shift _, with AltGr –'));
+  tap(by('AltGr for the next key')); tap(by('., with Shift >, with AltGr “'));
+  tap(by(',, with Shift <, with AltGr „'));
+  return true; })()`);
+check(await value(), "„–“,", "AltGr tapped on the picture");
+await evaluate("(() => { const t=document.getElementById('text'); t.value='ѝш'; t.dispatchEvent(new Event('input')); return true; })()");
 // Kept for the next visit
 check(await evaluate("localStorage.getItem('bulgarian-keyboard-text')"), "ѝш", "kept in the browser");
 // The keys of the picture that are not characters
 await evaluate(`(() => { const t=document.getElementById('text'); t.value=''; t.focus();
   const keys=[...document.querySelectorAll('#keyboard g.k')];
-  const by=(name)=>keys.find(g=>g.getAttribute('aria-label')===name);
+  const by=(name)=>keys.find(g=>{ const l=g.getAttribute('aria-label'); return l===name || l.startsWith(name+', with AltGr'); });
   const tap=(g)=>g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
   tap(by('Caps Lock')); tap(by('а')); tap(by('б'));
   tap(by('Shift for the next key')); tap(by('в')); tap(by('г'));
@@ -125,7 +147,7 @@ await evaluate(`(() => { const t=document.getElementById('text'); t.value='x'; t
   for (const g of document.querySelectorAll('#keyboard g.k.off')) g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true}));
   return true; })()`);
 check(await value(), "x", "the disabled keys type nothing");
-check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 8, "eight disabled keys: the bottom row's seven and Caps Lock");
+check(await evaluate("document.querySelectorAll('#keyboard g.k[aria-disabled=true]').length"), 7, "seven disabled keys: the bottom row's six and Caps Lock (the right Alt is AltGr)");
 // Copy: plain text alone
 await send("Browser.grantPermissions", { origin: new URL(url).origin, permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"] });
 await evaluate("document.getElementById('text').value='Пиши <ми>\\nдве'; document.getElementById('copy').click(); true");

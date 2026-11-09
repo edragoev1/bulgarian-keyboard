@@ -9,6 +9,10 @@ Why this keyboard:
   English first reaches for. The traditional phonetic layout puts В on W; here
   the two are swapped, Ж on W, and every other key is where the traditional
   layout has it.
+- With AltGr (the right Alt, or Ctrl+Alt as on Windows, or the picture's
+  AltGr tapped): the Bulgarian quotes „ and “ on comma and period, the dash
+  – on minus, and € on 5 and E, shown at the keys' bottom left. Shift with
+  comma, period and minus types < > _, as Microsoft's layout has them.
 - You type on your own keyboard, and each key becomes a Cyrillic letter as
   you press it: nothing to install, no system layout to switch, no text to
   convert afterward.

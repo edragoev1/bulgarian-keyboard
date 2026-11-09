@@ -6,12 +6,12 @@ const { ROWS, TYPES, cyrillic } = require("./layout.js");
 
 // Every key of the picture, as typed without and with Shift
 const want = {
-    "`": "ч", "~": "Ч", "#": "№", "^": "€", "&": "§", "_": "–",
+    "`": "ч", "~": "Ч", "#": "№", "^": "€", "&": "§", "_": "_",
     q: "я", w: "ж", e: "е", r: "р", t: "т", y: "ъ", u: "у", i: "и", o: "о", p: "п",
     "[": "ш", "]": "щ", "\\": "ю", "{": "Ш", "}": "Щ", "|": "Ю",
     a: "а", s: "с", d: "д", f: "ф", g: "г", h: "х", j: "й", k: "к", l: "л",
     z: "з", x: "ь", X: "ѝ", c: "ц", v: "в", b: "б", n: "н", m: "м",
-    "<": "„", ">": "“", W: "Ж", V: "В",
+    "<": "<", ">": ">", W: "Ж", V: "В",
 };
 for (const [us, bg] of Object.entries(want)) {
     assert.equal(cyrillic(us), bg, us);
@@ -39,6 +39,13 @@ assert.equal(cyrillic("Vasil"), "Васил");
 assert.equal(cyrillic("[opska salata"), "шопска салата");
 assert.equal(cyrillic("`ervena ]uka"), "червена щука");
 assert.equal(cyrillic("\\nak, wena"), "юнак, жена");
-assert.equal(cyrillic("<Zdravej!>"), "„Здравей!“");
+assert.equal(cyrillic("<Zdravej!>"), "<Здравей!>");
+
+// AltGr: the Bulgarian quotes, the dash and the euro
+const { ALTGR } = require("./layout.js");
+assert.equal(ALTGR.get(","), "„");
+assert.equal(ALTGR.get("."), "“");
+assert.equal(ALTGR.get("-"), "–");
+assert.equal(ALTGR.get("5"), "€");
 assert.equal(cyrillic("Tova e тест 123."), "Това е тест 123.");
 console.log("All checks pass.");
