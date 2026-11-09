@@ -204,13 +204,13 @@ await send("Page.reload");
 await sleep(1500);
 // The desktop: no note
 check(await evaluate("Math.round(document.querySelector('.phone-note').getBoundingClientRect().height)"), 0, "the desktop: no phone note");
-// IBM Plex Sans loaded, and drawing the Bulgarian forms: the same letters
-// are a different width with lang="bg" than with lang="ru"
+// IBM Plex Sans loaded, in the standard Cyrillic forms: the same letters
+// are the same width with lang="bg" as with lang="ru"
 check(await evaluate(`(async () => { await document.fonts.ready; 
   const span=(lang, style)=>{ const e=document.createElement('span'); e.lang=lang; e.style.cssText='font: 40px Plex; position: absolute; white-space: pre;' + style; e.textContent='вгджзиклптцшщъью'; document.body.appendChild(e); const w=e.getBoundingClientRect().width; e.remove(); return w; };
   return [document.fonts.check('16px Plex'), document.fonts.check('600 16px Plex'),
-    span('bg','') !== span('ru',''), getComputedStyle(document.getElementById('text')).fontFamily.startsWith('Plex')].join(); })()`),
-  "true,true,true,true", "Plex Sans loaded, with the Bulgarian letter forms");
+    span('bg','') === span('ru',''), getComputedStyle(document.getElementById('text')).fontFamily.startsWith('Plex')].join(); })()`),
+  "true,true,true,true", "Plex Sans loaded, in the standard Cyrillic forms");
 check(errors.join(" | "), "", "no errors in the console");
 ws.close(); chrome.kill();
 console.log(fail ? `${fail} failed` : "All pass.");

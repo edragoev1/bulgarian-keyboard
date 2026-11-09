@@ -24,8 +24,9 @@ Why this keyboard:
   email or a document.
 - The text stays in your browser for the next visit; nothing is ever sent
   anywhere.
-- The letters are Bulgarian: IBM Plex Sans draws the Bulgarian forms (д, л,
-  ж, к, т and others), which many phones' own fonts lack.
+- The letters are drawn in IBM Plex Sans, in the standard Cyrillic forms, as
+  PDFjet Write and its PDFs draw them; the text is marked Bulgarian, so that
+  screen readers read it in Bulgarian.
 
 - layout.js: the layout, one table; the page types with it and draws its
   picture from it.
