@@ -1,0 +1,6 @@
+{
+  "name": "pdfjet-keyboard",
+  "private": true,
+  "type": "module",
+  "devDependencies": { "typescript": "^5.9.3", "wrangler": "^4.165.0" }
+}

@@ -1,0 +1,24 @@
+{
+  // keyboard.pdfjet.com on Cloudflare (21 November 2026): the page served
+  // from ./site (make-site.sh) by this Worker on the route
+  // keyboard.pdfjet.com/*, with the headers .htaccess gave it on IONOS;
+  // anything its files do not have goes on to IONOS until it closes. Deploy
+  // from this folder: ./make-site.sh && npx wrangler deploy. Undo: delete
+  // the route.
+  "name": "pdfjet-keyboard",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./site",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "none",
+    "not_found_handling": "none"
+  }
+  ,
+  // The route, set 21 November 2026
+  "routes": [{ "pattern": "keyboard.pdfjet.com/*", "zone_name": "pdfjet.com" }]
+}
