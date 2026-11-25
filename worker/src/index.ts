@@ -1,5 +1,6 @@
 // keyboard.pdfjet.com: the keyboard page's files from Cloudflare, with the
-// headers of the page's .htaccess; anything else from IONOS, as before.
+// headers of the page's .htaccess. Nothing goes on to IONOS (25 November
+// 2026): an address the files do not have is a 404 of its own, a POST a 405.
 
 interface Env {
     ASSETS: Fetcher;
@@ -24,17 +25,26 @@ export default {
             return Response.redirect(`https://keyboard.pdfjet.com${url.pathname}${url.search}`, 301);
         }
         if (request.method !== "GET" && request.method !== "HEAD") {
-            return fetch(request);
+            return withHeaders(new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } }));
         }
         const path = url.pathname === "/" ? "/index.html" : url.pathname;
         const file = await env.ASSETS.fetch(new Request(new URL(path + url.search, url), request));
         if (file.status === 404) {
-            return fetch(request);
+            return withHeaders(
+                new Response(request.method === "HEAD" ? null : "Not found\n", {
+                    status: 404,
+                    headers: { "Content-Type": "text/plain; charset=utf-8" },
+                }),
+            );
         }
-        const response = new Response(file.body, file);
-        for (const [name, value] of Object.entries(HEADERS)) {
-            response.headers.set(name, value);
-        }
-        return response;
+        return withHeaders(new Response(file.body, file));
     },
 } satisfies ExportedHandler<Env>;
+
+// The answer with HEADERS set on it
+function withHeaders(response: Response): Response {
+    for (const [name, value] of Object.entries(HEADERS)) {
+        response.headers.set(name, value);
+    }
+    return response;
+}
